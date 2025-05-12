@@ -12,7 +12,12 @@ This suggests it's not the GIL that's bottlenecking the process. Since PaddleOCR
 
 
 
-While spawning processes in Python to make it parallelise cleanly is rather involved, the performance is even better than with Rust doing it and having to call Python with `pyo3`.
+While spawning processes in Python to make it parallelise cleanly is rather involved, the performance is realistically the same as with Rust doing it and having to call Python with `pyo3`. 
+
+
+
+
+If one were to write a Rust application calling the compiled version of PaddleOCR itself with no Python hook there might be some minor improvement, but not at the scale warranting such development.
 
 ## Usage
 You will need an `/images` folder with things to OCR in either case.
