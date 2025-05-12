@@ -1,4 +1,5 @@
 #Processed 100 images in 10.71 seconds (9.34 images/sec)
+#Processed 1000 images in 37.62 seconds (26.58 images/sec)
 import os
 import time
 import logging
@@ -30,8 +31,8 @@ def main():
         results = pool.map(ocr_image, image_paths)
 
     duration = time.time() - start
-    for path, result in results:
-        print(f"{path}: {result}")
+    #for path, result in results: #uncommment to see OCR results
+    #    print(f"{path}: {result}")
 
     print(
         f"\nProcessed {total} images in {duration:.2f} seconds "

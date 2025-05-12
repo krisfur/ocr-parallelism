@@ -1,4 +1,5 @@
 //Processed 100 images in 11.12 seconds (9.00 images/sec)
+//Processed 1000 images in 65.68 seconds (15.23 images/sec)
 use pyo3::prelude::*;
 use pyo3::types::PyDict;
 use rayon::prelude::*;
@@ -71,9 +72,13 @@ fn run_ocr(py: Python<'_>, image_path: &str) -> PyResult<String> {
 }
 
 fn main() -> PyResult<()> {
+    unsafe {
+        std::env::set_var("OMP_NUM_THREADS", "2");
+        std::env::set_var("CPU_NUM_THREADS", "2");
+    }
     // Limit Rayon to 4 threads for reproducibility
     rayon::ThreadPoolBuilder::new()
-        .num_threads(4)
+        .num_threads(6)
         .build_global()
         .expect("Failed to build custom Rayon thread pool");
 
@@ -100,8 +105,8 @@ fn main() -> PyResult<()> {
     image_paths.par_iter().for_each(|path| {
         Python::with_gil(|py| {
             match run_ocr(py, path) {
-                //Ok(_) => {}, //for zero output
-                Ok(text) => println!("{}: {}", path, text), //for printing results
+                Ok(_) => {}, //for zero output
+                //Ok(text) => println!("{}: {}", path, text), //for printing results
                 Err(e) => eprintln!("Error on {}: {}", path, e),
             }
         });
