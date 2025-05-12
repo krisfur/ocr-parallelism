@@ -1,4 +1,4 @@
-//Processed 100 images in 16.65 seconds (6.01 images/sec)
+//Processed 100 images in 11.12 seconds (9.00 images/sec)
 use pyo3::prelude::*;
 use pyo3::types::PyDict;
 use rayon::prelude::*;
@@ -41,12 +41,33 @@ fn get_or_init_ocr(py: Python<'_>) -> PyResult<PyObject> {
 
 
 // Run OCR on a single image
-fn run_ocr(image_path: &str) -> PyResult<String> {
-    Python::with_gil(|py| {
+fn run_ocr(py: Python<'_>, image_path: &str) -> PyResult<String> {
+    let sys = py.import("sys")?;
+    let io = py.import("io")?;
+
+    // Backup original stdout/stderr
+    let original_stdout = sys.getattr("stdout")?;
+    let original_stderr = sys.getattr("stderr")?;
+
+    // Redirect to dummy StringIO
+    let fake_output = io.call_method0("StringIO")?;
+    sys.setattr("stdout", &fake_output)?;
+    sys.setattr("stderr", &fake_output)?;
+
+    // Run OCR
+    let result = (|| -> PyResult<String> {
         let reader = get_or_init_ocr(py)?;
-        let result = reader.bind(py).call_method1("ocr", (image_path,))?;
-        Ok(format!("{:?}", result))
-    })
+        let ocr_result = reader
+            .bind(py)
+            .call_method1("ocr", (image_path,))?;
+        Ok(format!("{:?}", ocr_result))
+    })();
+
+    // Restore original stdout/stderr
+    sys.setattr("stdout", original_stdout)?;
+    sys.setattr("stderr", original_stderr)?;
+
+    result
 }
 
 fn main() -> PyResult<()> {
@@ -77,10 +98,13 @@ fn main() -> PyResult<()> {
 
     // Parallel processing
     image_paths.par_iter().for_each(|path| {
-        match run_ocr(path) {
-            Ok(_text) => {},//println!("{}: {}", path, text),
-            Err(e) => eprintln!("Error on {}: {}", path, e),
-        }
+        Python::with_gil(|py| {
+            match run_ocr(py, path) {
+                //Ok(_) => {}, //for zero output
+                Ok(text) => println!("{}: {}", path, text), //for printing results
+                Err(e) => eprintln!("Error on {}: {}", path, e),
+            }
+        });
     });
 
     // Report duration

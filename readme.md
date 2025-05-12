@@ -5,7 +5,7 @@ Testing if the GIL in Python has a tangible impact on parallelising PaddleOCR fo
 ## Results
 Python only version: `Processed 100 images in 10.71 seconds (9.34 images/sec)`
 
-Rust parallelised version: `Processed 100 images in 16.65 seconds (6.01 images/sec)`
+Rust parallelised version: `Processed 100 images in 11.12 seconds (9.00 images/sec)`
 
 This suggests it's not the GIL that's bottlenecking the process. Since PaddleOCR relies on C++ based PaddlePaddle for its backend the act of OCR itself sees no difference in performance and the GIL is used and released properly. 
 
