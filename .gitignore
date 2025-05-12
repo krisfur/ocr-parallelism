@@ -1,0 +1,18 @@
+/target
+/images
+
+# Rust / Cargo
+target/
+**/*.rs.bk
+Cargo.lock
+
+# IDEs
+.vscode/
+.idea/
+
+# OS-generated
+.DS_Store
+Thumbs.db
+
+# Python
+/__pycache__
