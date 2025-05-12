@@ -1,5 +1,4 @@
-#Processed 100 images in 10.71 seconds (9.34 images/sec)
-#Processed 1000 images in 37.62 seconds (26.58 images/sec)
+#Processed 1000 images in 42.62 seconds (23.46 images/sec)
 import os
 import time
 import logging
